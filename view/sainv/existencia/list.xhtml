@@ -1,0 +1,105 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	template="/layout/templateKuPtll.xhtml">
+	<ui:define name="body">
+		<rich:panel>
+			<f:facet name="header">#{app.existencia_head}</f:facet>
+			<h:form id="formA">
+				<p:growl globalOnly="true" sticky="false" life="3000" />
+				<center>
+				<h:panelGrid columns="3">
+					<s:decorate template="/layout/kEditSpace.xhtml">
+						<ui:define name="label">#{app.compramast_branch}:</ui:define>
+						<h:selectOneMenu value="#{productoHome.sucursalFlt}" required="false">
+							<s:selectItems value="#{sucursalHome.resultList}" var="_suc" label="#{_suc.nombre}" noSelectionLabel=" " />
+							<s:convertEntity />
+							<a:support event="onchange" ajaxSingle="true" eventsQueue="q1" />
+						</h:selectOneMenu>
+					</s:decorate>
+					<s:decorate template="/layout/kEditSpace.xhtml">
+						<a:commandButton value="#{app.bt_rep_exis_prd}" action="#{productoHome.loadConsolidadoExis()}"
+							oncomplete="showReport('listadoExistencias', '#{conversation.id}');" styleClass="pdfBtn"   />
+					</s:decorate>
+					<s:decorate template="/layout/kEditSpace.xhtml">
+						<a:commandButton value="#{app.bt_rep_exis_suc}" action="#{productoHome.loadSucursalesRep()}"
+							oncomplete="showReport('listadoExistenciasSuc', '#{conversation.id}');" styleClass="pdfBtn"  />
+					</s:decorate>
+				</h:panelGrid>
+				</center>
+
+				<center>
+					<s:span styleClass="busHead">#{app.compramast_buscar_product}:</s:span>
+					<rich:spacer width="0" />
+					<s:decorate></s:decorate>
+					<h:inputText styleClass="busProd" value="#{productoHome.nomCoinci}"
+						id="_nomCoinci" autocomplete="off" >
+						<a:support event="onkeydown" reRender="panel" eventsQueue="q1"
+							ajaxSingle="true" action="#{productoHome.getProductosExisLst()}" />
+
+						<a:support event="onkeyup" reRender="panel" eventsQueue="q1"
+							ajaxSingle="true" action="#{productoHome.getProductosExisLst()}" />
+					</h:inputText>
+				</center>
+				<h:panelGroup id="panel">
+				<rich:spacer height="10" />
+				<a:queue name="q1" />
+				<rich:dataTable var="res" value="#{productoHome.prdsExistencias}" id="_table"
+					rows="20" align="center"  rowClasses="tblEven,tblOdd" onRowMouseOver="this.style.backgroundColor='#A3CAF1'" onRowMouseOut="this.style.backgroundColor='#{a4jSkin.rowClassName}'" 
+					headerClass="tablaHeader" footerClass="tableScroll" rendered="#{not empty productoHome.nomCoinci}">
+					<f:facet name="header">#{app.productolist_list}</f:facet>
+					<rich:column >
+						<f:facet name="header">Cod. PRD.</f:facet>
+						<h:outputText value="#{res.referencia}" />
+					</rich:column>
+					<rich:column >
+						<f:facet name="header">Cod. CAT.</f:facet>
+						<h:outputText value="#{res.categoria.codigo}" />
+					</rich:column>
+					<rich:column >
+						<f:facet name="header">#{app.productolist_col2}</f:facet>
+						<h:outputText value="#{res.nombre}" />
+					</rich:column>
+					<rich:column >
+						<f:facet name="header">#{app.productolist_col5}</f:facet>
+						<h:outputText value="#{res.marca.nombre}" />
+					</rich:column>
+					<rich:column >
+						<f:facet name="header">#{app.producto_prc1}</f:facet>
+						<h:outputText value="#{res.prcNormal}" >
+							<f:convertNumber currencySymbol="$" type="currency" locale="en-US"
+                            	groupingUsed="true" integerOnly="true" maxFractionDigits="2" />
+						</h:outputText>
+					</rich:column>
+					<rich:column >
+						<f:facet name="header">#{app.existencia_totglobal}</f:facet>
+						<h:outputText value="#{res.totalPrds}" >
+							<f:convertNumber locale="en-US" groupingUsed="true" integerOnly="true" maxFractionDigits="0" />
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">#{msn.col_actions}</f:facet>
+						<s:link title="#{app.productolist_edit}" rendered="true"
+							view="/sainv/existencia/master.xhtml" propagation="begin">
+							<h:graphicImage value="/kubeImg/table_edit16.png" />
+							<f:param name="id" value="#{res.id}" />
+						</s:link>
+					</rich:column>
+					<f:facet name="footer">
+						<rich:datascroller id="ds1" renderIfSinglePage="true" />
+					</f:facet>
+				</rich:dataTable>
+				</h:panelGroup>
+
+			</h:form>
+		</rich:panel>
+		 
+	</ui:define>
+</ui:composition>
